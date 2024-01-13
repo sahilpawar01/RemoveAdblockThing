@@ -11,10 +11,9 @@
 // @grant        none
 // ==/UserScript==
 
-(function()
- {
+(function() {
     //
-    //      Config
+    // Config
     //
 
     // Enable The Undetected Adblocker
@@ -30,7 +29,7 @@
     const debugMessages = true;
 
     //
-    //      CODE
+    // CODE
     //
     // If you have any suggestions, bug reports,
     // or want to contribute to this userscript,
@@ -40,7 +39,7 @@
 
 
     //
-    // Varables used for the Popup Remover
+    // Variables used for the Popup Remover
     //
     const keyEvent = new KeyboardEvent("keydown", {
       key: "k",
@@ -58,21 +57,21 @@
       view: window,
     });
 
-    //This is used to check if the video has been unpaused already
+    // This is used to check if the video has been unpaused already
     let unpausedAfterSkip = 0;
 
     //
-    // Varables used for adblock
+    // Variables used for adblock
     //
 
     // Store the initial URL
     let currentUrl = window.location.href;
 
-    // Used for if there is ad found
+    // Used for if there is an ad found
     let isAdFound = false;
 
     //
-    // Varables used for updater
+    // Variables used for updater
     //
 
     let hasIgnoredUpdate = false;
@@ -81,14 +80,14 @@
     // Setup
     //
 
-    //Set everything up here
+    // Set everything up here
     if (debugMessages) console.log("Remove Adblock Thing: Script started ");
 
     if (adblocker) removeAds();
     if (removePopup) popupRemover();
     if (updateCheck) checkForUpdate();
 
-    // Remove Them pesski popups
+    // Remove Them pesky popups
     function popupRemover() {
         setInterval(() => {
 
@@ -112,7 +111,7 @@
             if (popup) {
                 if (debugMessages) console.log("Remove Adblock Thing: Popup detected, removing...");
 
-                if(popupButton) popupButton.click();
+                if (popupButton) popupButton.click();
 
                 popup.remove();
                 unpausedAfterSkip = 2;
@@ -120,7 +119,7 @@
                 fullScreenButton.dispatchEvent(mouseEvent);
 
                 setTimeout(() => {
-                  fullScreenButton.dispatchEvent(mouseEvent);
+                    fullScreenButton.dispatchEvent(mouseEvent);
                 }, 500);
 
                 if (debugMessages) console.log("Remove Adblock Thing: Popup removed");
@@ -135,28 +134,27 @@
 
         }, 1000);
     }
-    // undetected adblocker method
-    function removeAds()
-    {
+
+    // Undetected adblocker method
+    function removeAds() {
 
         if (debugMessages) console.log("Remove Adblock Thing: removeAds()");
 
         var video = document.querySelector('video');
         var videoPlayback = video.playbackRate;
 
-        setInterval(() =>{
+        setInterval(() => {
 
             const ad = [...document.querySelectorAll('.ad-showing')][0];
             video = document.querySelector('video');
 
-            //remove page ads
+            // Remove page ads
             if (window.location.href !== currentUrl) {
                 currentUrl = window.location.href;
                 removePageAds();
             }
 
-            if (ad)
-            {
+            if (ad) {
                 isAdFound = true;
 
                 //
@@ -168,17 +166,16 @@
                 const nonVid = document.querySelector(".ytp-ad-skip-button-modern");
 
                 // Add a little bit of obfuscation when skipping to the end of the video.
-                if (video){
+                if (video) {
 
                     video.playbackRate = 10;
                     video.volume = 0;
 
-                    if (isNaN(video.duration)){
-                        //removed for now as of now cus it cusing problems
-                        //var randomNumber = Math.random() * (0.5 - 0.1) + 0.1;
+                    if (isNaN(video.duration)) {
+                        // removed for now as of now cus it causing problems
+                        // var randomNumber = Math.random() * (0.5 - 0.1) + 0.1;
                         video.currentTime = video.duration;
-                    }
-                    else{
+                    } else {
                         video.currentTime = 0;
                     }
                     video.play();
@@ -209,26 +206,25 @@
                 const closeAdCenterButton = document.querySelector('.zBmRhe-Bz112c');
                 closeAdCenterButton?.click();
 
-
                 if (video) video.play();
 
                 if (debugMessages) console.log("Remove Adblock Thing: skipped Ad (✔️)");
 
             } else {
 
-                //check for unreasonale playback speed
-                if(video.playbackRate == 10 && video){
+                // check for unreasonable playback speed
+                if (video.playbackRate == 10 && video) {
                     video.playbackRate = videoPlayback;
                 }
 
-                if (isAdFound){
+                if (isAdFound) {
                     isAdFound = false;
 
                     // this is right after the ad is skipped
-                    // fixes if you set the speed to 2x annd a ad plays it sets it back to the dfualt 1x
+                    // fixes if you set the speed to 2x and an ad plays it sets it back to the default 1x
 
-                    //somthing bugged out default to 1x then
-                    if (videoPlayback == 10){
+                    // something bugged out default to 1x then
+                    if (videoPlayback == 10) {
                         videoPlayback = 1;
 
                         var _opupContainer = document.querySelector('body > ytd-app > ytd-popup-container > tp-yt-paper-dialog');
@@ -238,112 +234,15 @@
                         if (_idebackdrop) _idebackdrop.style.display = "block";
                     }
 
-                    if(video) video.playbackRate = videoPlayback;
-                }
-                else{
-                    if(video) videoPlayback = video.playbackRate;
+                    if (video) video.playbackRate = videoPlayback;
+                } else {
+                    if (video) videoPlayback = video.playbackRate;
                 }
             }
 
-        }, 50)
+        }, 50);
 
         removePageAds();
     }
-    //removes ads on the page (not video player ads)
-    function removePageAds(){
 
-        const sponsor = document.querySelectorAll("div#player-ads.style-scope.ytd-watch-flexy, div#panels.style-scope.ytd-watch-flexy");
-        const style = document.createElement('style');
 
-        style.textContent = `
-            ytd-action-companion-ad-renderer,
-            div#root.style-scope.ytd-display-ad-renderer.yt-simple-endpoint,
-            div#sparkles-container.style-scope.ytd-promoted-sparkles-web-renderer,
-            div#main-container.style-scope.ytd-promoted-video-renderer,
-            ytd-in-feed-ad-layout-renderer,
-            .ytd-video-masthead-ad-v3-renderer,
-            div#player-ads.style-scope.ytd-watch-flexy,
-            yt-about-this-ad-renderer,
-            yt-mealbar-promo-renderer,
-
-            #masthead-ad {
-                display: none !important;
-            }
-        `;
-
-        document.head.appendChild(style);
-
-        sponsor?.forEach((element) => {
-             if (element.getAttribute("id") === "rendering-content") {
-                element.childNodes?.forEach((childElement) => {
-                  if (childElement?.data.targetId && childElement?.data.targetId !=="engagement-panel-macro-markers-description-chapters"){
-                      //Skipping the Chapters section
-                        element.style.display = 'none';
-                    }
-                   });
-            }
-         });
-
-         if (debugMessages) console.log("Remove Adblock Thing: Removed page ads (✔️)");
-    }
-
-    // Unpause the video Works most of the time
-    function unPauseVideo(video)
-    {
-        if (!video) return;
-        if (video.paused) {
-            // Simulate pressing the "k" key to unpause the video
-            document.dispatchEvent(keyEvent);
-            unpausedAfterSkip = 0;
-            if (debugMessages) console.log("Remove Adblock Thing: Unpaused video using 'k' key");
-        } else if (unpausedAfterSkip > 0) unpausedAfterSkip--;
-    }
-
-    //
-    // Update check
-    //
-
-    function checkForUpdate(){
-
-        if (!(window.location.href.includes("youtube.com"))){
-            return;
-        }
-
-        if (hasIgnoredUpdate){
-            return;
-        }
-
-        const scriptUrl = 'https://raw.githubusercontent.com/TheRealJoelmatic/RemoveAdblockThing/main/Youtube-Ad-blocker-Reminder-Remover.user.js';
-
-        fetch(scriptUrl)
-        .then(response => response.text())
-        .then(data => {
-            // Extract version from the script on GitHub
-            const match = data.match(/@version\s+(\d+\.\d+)/);
-            if (match) {
-                const githubVersion = parseFloat(match[1]);
-                const currentVersion = parseFloat(GM_info.script.version);
-
-                if (githubVersion > currentVersion) {
-                    console.log('Remove Adblock Thing: A new version is available. Please update your script.');
-
-                    var result = window.confirm("Remove Adblock Thing: A new version is available. Please update your script.");
-
-                    if (result) {
-                        window.location.replace(scriptUrl);
-                    }
-
-                } else {
-                    console.log('Remove Adblock Thing: You have the latest version of the script.');
-                }
-            } else {
-                console.error('Remove Adblock Thing: Unable to extract version from the GitHub script.');
-            }
-        })
-        .catch(error => {
-            hasIgnoredUpdate = true;
-            console.error('Remove Adblock Thing: Error checking for updates:', error);
-        });
-        hasIgnoredUpdate = true;
-    }
-})();
